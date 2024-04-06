@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
+
 
 def get_wikipedia_data(url):
     """
@@ -52,26 +52,6 @@ def extract_stadium_data(html):
         data.append(values)
 
     return data
-
-def main():
-    # URL of the Wikipedia page containing stadium data
-    wikipedia_url = 'https://es.wikipedia.org/wiki/Anexo:Estadios_de_f%C3%BAtbol_de_Am%C3%A9rica_del_Sur'
-
-    # Get Wikipedia data
-    html_content = get_wikipedia_data(wikipedia_url)
-
-    if html_content:
-        # Extract stadium data
-        stadium_data = extract_stadium_data(html_content)
-
-        df = pd.DataFrame(stadium_data)
-        print(df.head())
-
-    else:
-        print('Failed to retrieve data from Wikipedia')
-
-if __name__ == "__main__":
-    main()
 
 
 
