@@ -8,6 +8,7 @@ terraform {
 }
 
 provider "google" {
+  credentials = file("keys/keysp1.json")
   project = "cloud-etl-orchestration"
   region  = "southamerica-east1"
 }
@@ -37,30 +38,15 @@ resource "google_storage_bucket" "gcs_stadium_bucket" {
   }
 }
 
-#GCF: Functions
-resource "google_cloudfunctions_function" "gcf_transform_data" {
-  name        = "transform_stadium_data"
-  description = "Transform data when the file arrives to the bucket"
-  runtime     = "nodejs14"
-
-}
-
-
-resource "google_cloudfunctions_function" "gcf_load_data" {
-  name        = "load_stadium_data"
-  description = "Load data to bigquery"
-  runtime     = "nodejs14"
-  
-}
-
 #Bigquery
 resource "google_bigquery_dataset" "dw_bigquery" {
   dataset_id = "stadium_data"
   location = "southamerica-east1"
 }
 
-#GCC: Composer/Airflow
-resource "google_composer_environment" "orchestrator_pipeline" {
-  name   = "orchestrator_pipeline"
-  region = "southamerica-east1"
+resource "google_bigquery_table" "sa_stadium_table" {
+  dataset_id = google_bigquery_dataset.dw_bigquery.dataset_id
+  table_id   = "southamerica-stadiums" 
+  deletion_protection = false
+
 }
