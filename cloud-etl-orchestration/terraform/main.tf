@@ -8,7 +8,6 @@ terraform {
 }
 
 provider "google" {
-  credentials = file("keys/keysp1.json")
   project = "cloud-etl-orchestration"
   region  = "southamerica-east1"
 }
