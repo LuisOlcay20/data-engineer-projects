@@ -18,7 +18,8 @@ def upload_to_gcs(data, bucket_name, file_name):
     blob = bucket.blob(file_name)
 
     # Convert DataFrame to CSV format and then to bytes
-    csv_data = data.to_csv(index=False, dtype={'stadium': str, 'capacity': int, 'country': str, 'city': str, 'teams': str}).encode('utf-8')
+    csv_data = data.to_csv(index=False)
+    csv_bytes = csv_data.encode('utf-8')
 
     # Upload the CSV to GCS
     blob.upload_from_string(csv_data, content_type='text/csv')
@@ -43,6 +44,7 @@ def main():
 
         # Upload data to GCS
         upload_to_gcs(df, gcs_bucket, gcs_file_name)
+        
 
     else:
         print('Failed to retrieve data from Wikipedia')
