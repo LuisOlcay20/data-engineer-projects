@@ -1,16 +1,11 @@
 import requests
 import json
 import csv
-from config import URL_API_TEAMS, RAPIDAPI_KEY, RAPIDAPI_HOST
+from config import URL_API_TEAMS, HEADERS,RAPIDAPI_KEY, RAPIDAPI_HOST
 
 def download_teams():
 
-    headers = {
-        "X-RapidAPI-Key": RAPIDAPI_KEY,
-        "X-RapidAPI-Host": RAPIDAPI_HOST
-    }
-
-    response = requests.get(URL_API_TEAMS, headers=headers)
+    response = requests.get(URL_API_TEAMS, headers=HEADERS)
 
     if response.status_code == 200:
         data = response.json().get('api', {}).get('teams', [])
