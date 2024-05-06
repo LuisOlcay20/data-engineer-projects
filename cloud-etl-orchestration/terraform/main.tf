@@ -13,8 +13,8 @@ provider "google" {
 }
 
 #GCS: Bucket
-resource "google_storage_bucket" "gcs_stadium_bucket" {
-  name          = "stadiums_bucket"
+resource "google_storage_bucket" "gcs_chilean_football" {
+  name          = "chilean_football_bucket"
   location      = "southamerica-east1"
   force_destroy = true
 
