@@ -19,7 +19,7 @@ The pipeline consists of the following steps:
 
 ## Architecture
 
-![alt text](image.png)
+!![Data Pipeline Architecture](image.png)
 
 ### Components
 
