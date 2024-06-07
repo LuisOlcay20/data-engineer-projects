@@ -1,9 +1,4 @@
-# Cloud ETL Orchestration
-
-## Overview
-This project is designed to orchestrate the Extract, Transform, Load (ETL) process in the cloud using Google Cloud Platform services. It automates the process of extracting data from a source, transforming it, and loading it into a destination storage system, such as BigQuery.
-
-## Change project idea # Sports Data Pipeline
+# Sports Data Pipeline
 
 This project sets up a data pipeline that extracts sports data from an API, processes it using Google Cloud services, and stores it in Google BigQuery for analysis. The pipeline is orchestrated using Google Cloud Composer.
 
