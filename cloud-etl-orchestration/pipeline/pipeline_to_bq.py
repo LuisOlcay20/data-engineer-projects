@@ -3,22 +3,6 @@ from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.io import ReadFromText
 from apache_beam.io.gcp.bigquery import WriteToBigQuery, BigQueryDisposition
 
-class ApplyTransformation(beam.DoFn):
-    def __init__(self, schema):
-        self.schema = schema
-
-    def process(self, element):
-        data = element.split(',')
-        result = {}
-        for idx, field in enumerate(self.schema):
-            if field['type'] == int:
-                result[field['name']] = int(data[idx].strip()) if data[idx].strip().isdigit() else None
-            elif field['type'] == bool:
-                result[field['name']] = (data[idx].strip().lower() == 'true')
-            else:
-                result[field['name']] = data[idx].strip()
-        yield result
-
 def run(argv=None):
     pipeline_options = PipelineOptions(
         flags=argv,
@@ -31,49 +15,48 @@ def run(argv=None):
 
     schemas = {
         'chilean_teams_2024': [
-            {'name': 'team_id', 'type': int},
-            {'name': 'country', 'type': str},
-            {'name': 'venue_city', 'type': str},
-            {'name': 'name', 'type': str},
-            {'name': 'founded', 'type': int},
-            {'name': 'venue_name', 'type': str}
+            {'name': 'team_id', 'type': 'INTEGER'},
+            {'name': 'country', 'type': 'STRING'},
+            {'name': 'venue_city', 'type': 'STRING'},
+            {'name': 'name', 'type': 'STRING'},
+            {'name': 'founded', 'type': 'INTEGER'},
+            {'name': 'venue_name', 'type': 'STRING'}
         ],
         'scorers_information_2024': [
-            {'name': 'firstname', 'type': str},
-            {'name': 'lastname', 'type': str},
-            {'name': 'age', 'type': int},
-            {'name': 'nationality', 'type': str},
-            {'name': 'height', 'type': str},
-            {'name': 'weight', 'type': str},
-            {'name': 'injured', 'type': bool},
-            {'name': 'team', 'type': str}
+            {'name': 'firstname', 'type': 'STRING'},
+            {'name': 'lastname', 'type': 'STRING'},
+            {'name': 'age', 'type': 'INTEGER'},
+            {'name': 'nationality', 'type': 'STRING'},
+            {'name': 'height', 'type': 'STRING'},
+            {'name': 'weight', 'type': 'STRING'},
+            {'name': 'injured', 'type': 'BOOLEAN'},
+            {'name': 'team', 'type': 'STRING'}
         ],
         'scorers_statistics_2024': [
-            {'name': 'firstname', 'type': str},
-            {'name': 'lastname', 'type': str},
-            {'name': 'goals', 'type': int},
-            {'name': 'assists', 'type': int},
-            {'name': 'conceded', 'type': int},
-            {'name': 'penalty_scored', 'type': int},
-            {'name': 'penalty_missed', 'type': int},
-            {'name': 'total_passes', 'type': int},
-            {'name': 'key_passes', 'type': int},
-            {'name': 'total_duels', 'type': int},
-            {'name': 'duels_won', 'type': int}
+            {'name': 'firstname', 'type': 'STRING'},
+            {'name': 'lastname', 'type': 'STRING'},
+            {'name': 'goals', 'type': 'INTEGER'},
+            {'name': 'assists', 'type': 'INTEGER'},
+            {'name': 'conceded', 'type': 'INTEGER'},
+            {'name': 'penalty_scored', 'type': 'INTEGER'},
+            {'name': 'penalty_missed', 'type': 'INTEGER'},
+            {'name': 'total_passes', 'type': 'INTEGER'},
+            {'name': 'key_passes', 'type': 'INTEGER'},
+            {'name': 'total_duels', 'type': 'INTEGER'},
+            {'name': 'duels_won', 'type': 'INTEGER'}
         ]
     }
 
     with beam.Pipeline(options=pipeline_options) as p:
         for file_key, schema in schemas.items():
             file_path = f'gs://chilean_football_bucket/{file_key}.csv'
+            table_schema = ','.join(f'{field["name"]}:{field["type"]}' for field in schema)
             # Read data
             lines = p | f'Read {file_key}' >> ReadFromText(file_path)
-            # Apply transformations
-            transformed = lines | f'Transform {file_key}' >> beam.ParDo(ApplyTransformation(schema))
             # Write to BigQuery
-            transformed | f'Write {file_key} to BigQuery' >> WriteToBigQuery(
+            lines | f'Write {file_key} to BigQuery' >> WriteToBigQuery(
                 f'chilean_premier_league_2024.{file_key}',
-                schema=','.join(f'{field["name"]}:{field["type"].__name__.upper()}' for field in schema),
+                schema=table_schema,
                 create_disposition=BigQueryDisposition.CREATE_IF_NEEDED,
                 write_disposition=BigQueryDisposition.WRITE_APPEND
             )
